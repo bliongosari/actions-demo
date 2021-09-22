@@ -108,6 +108,45 @@ jobs:
 
 ## Workflow Syntax
 https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+| Syntax | Description | Example |
+|---|---|---|
+| name | The name of your workflow |  |
+| on | The name of the GitHub event that triggers the workflow. <br>You can provide a single event string, array of events,<br>array of event types | ```<br>on: push<br>on:[push, pull_request]<br>``` |
+| on.event_name.types | Selects the types of activity that will trigger a workflow run. | types:[published, created, edited] |
+| on.<push\|pull_request>.<branches\|tags> |  | branches, tags, branches-ignore, tags-ignore |
+| on.workflow_dispatch.inputs |  | on: workflow_dispatch: inputs: abc: --- |
+| on.schedule |  | cron:'30 5,17 * * *' |
+| permissions |  | permissions: read-all\|write-all |
+| env |  | env:<br>    SEVER: example |
+| defaults<br>default.run | You can provide default shell and working-directory options for all run steps in a workflow. <br>You can also set default settings for run that are only available to a job. |  |
+| concurrency | Concurrency ensures that only a single job or workflow using the same concurrency group will run at a time. | concurrency: staging_environment |
+| jobs<br>jobs.job_id<br>jobs.job_id.name<br>jobs.job_id.needs job3: needs: [job1, job2]<br>jobs.job_id.runs-on [self-hosted, linux]<br>jobs.job-id.permissions actions: \|read \|write\| none<br>jobs.job-id.environment (name+url) <br>jobs.job-id.concurrency<br>jobs.job-id.outputs<br>jobs.job-id.env<br>jobs.job-id.defaults<br>jobs.job-id.defaults.run<br>jobs.job_id.if<br>jobs.job_id.steps<br>jobs.job_id.steps[*].id<br>jobs.job_id.steps[*].if<br>jobs.job_id.steps[*].name<br>jobs.job_id.steps[*].uses <br>({owner}/{repo}/{path}@{ref}) (public)<br>./.github/actions/my-action   (local)<br>docker://{image}:{tag}        (docker hub)<br>docker://{host}/{image}:{tag} (docker packages container registry)<br>jobs.job_id.steps[*].run<br>jobs.job_id.steps[*].working-directory (./temp, ./client)<br>jobs.job_id.steps[*].shell (bash, cmd, etc)<br>jobs.<job_id>.steps[*].with<br>jobs.<job_id>.steps[*].with.args (For docker container, entrypoint)<br>jobs.<job_id>.steps[*].with.entrypoint (override dockerfile entrypoint)<br>jobs.<job_id>.steps[*].env<br>jobs.<job_id>.steps[*].continue-on-error<br>jobs.<job_id>.steps[*].timeout-minutes<br>jobs.<job_id>.timeout-minutes<br>jobs.<job_id>.strategy<br>jobs.<job_id>.strategy.matrix<br>jobs.<job_id>.strategy.fail-fast<br>jobs.<job_id>.strategy.max-parallel<br>jobs.<job_id>.continue-on-error<br>jobs.<job_id>.container<br>jobs.<job_id>.container.image<br>jobs.<job_id>.container.credentials<br>jobs.<job_id>.container.env<br>jobs.<job_id>.container.ports<br>jobs.<job_id>.container.volumes<br>jobs.<job_id>.container.options<br>jobs.<job_id>.services<br>jobs.<job_id>.services.<service_id>.image<br>jobs.<job_id>.services.<service_id>.credentials<br>jobs.<job_id>.services.<service_id>.env<br>jobs.<job_id>.services.<service_id>.ports<br>jobs.<job_id>.services.<service_id>.volumes<br>jobs.<job_id>.services.<service_id>.options |  |  |
+
+## Workflow commands
+Toolkit functions: 
+<img width="595" alt="Screen Shot 2021-09-22 at 22 54 40" src="https://user-images.githubusercontent.com/68419809/134347252-458d102a-03ae-425d-a29f-0c6c0b8a56ef.png">
+
+Set output parameter 
+```
+echo "::set-output name=action_fruit::strawberry"
+```
+Set debug message
+``` 
+::debug::{message}
+echo "::debug::Set the Octocat variable"
+```
+Set env variable
+```
+steps:
+  - name: Set the value
+    id: step_one
+    run: |
+      echo "action_state=yellow" >> $GITHUB_ENV
+  - name: Use the value
+    id: step_two
+    run: |
+      echo "${{ env.action_state }}" # This will output 'yellow'
+```
 
 ## Types of Actions
 **Docker container actions**
@@ -268,9 +307,12 @@ If a secret with the same name exists at multiple levels, the secret at the lowe
 - Self-hosted runners offer more control of hardware, operating system, and software tools than GitHub-hosted runners provide. 
 - With self-hosted runners, you can choose to create a custom hardware configuration with more processing power or memory to run larger jobs, install software available on your local network, and choose an operating system not offered by GitHub-hosted runners. 
 - Self-hosted runners can be physical, virtual, in a container, on-premises, or in a cloud.
-
 - Your runner machine connects to GitHub using the GitHub Actions self-hosted runner application.
 - A self-hosted runner is automatically removed from GitHub if it has not connected to GitHub Actions for more than 30 days.
+
+Proxy servers in self hoster runners
+<img width="879" alt="Screen Shot 2021-09-22 at 21 45 56" src="https://user-images.githubusercontent.com/68419809/134337878-eed02fd3-450d-4a4b-80e7-f6ea7db4231b.png">
+
 
 # Differences between GitHub-hosted and self-hosted runners
 GitHub-hosted runners offer a quicker, simpler way to run your workflows, while self-hosted runners are a highly configurable way to run workflows in your own custom environment.
@@ -287,6 +329,20 @@ GitHub-hosted runners offer a quicker, simpler way to run your workflows, while 
 - Are customizable to your hardware, operating system, software, and security requirements.
 - Don't need to have a clean instance for every job execution.
 - Are free to use with GitHub Actions, but you are responsible for the cost of maintaining your runner machines.
+
+
+# Excercises
+
+# Managing GitHub in Enterprise
+ - Enterprise level:
+ -  Configure github actions use policy
+ - Manually sync public actions for Enterprise Server (However already have automatically)
+
+- Organization level:
+- Document corporate standards
+- Create workflow templates (yml, and json metadata)
+
+
 
 
 
