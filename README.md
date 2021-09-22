@@ -86,9 +86,83 @@ To trigger the custom repository_dispatch webhook event, you must **send a POST 
 - Don't need to have a clean instance for every job execution.
 - Are free to use with GitHub Actions, but you are responsible for the cost of maintaining your runner machines.
 
-# Syntax
+## Workflow Syntax
 https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
 
+## Types of Actions
+**Docker container actions**
+- Docker containers package the environment with the GitHub Actions code. 
+- This creates a more consistent and reliable unit of work because the consumer of the action does not need to worry about the tools or dependencies.
+- A Docker container allows you to use specific versions of an operating system, dependencies, tools, and code. 
+- **Ideal for for actions that must run in a specific environment configuration**, because you can customize the operating system and tools. 
+- Because of the latency to build and retrieve the container, **Docker container actions are slower than JavaScript actions**.
 
-GitHub Actions in the Enterprise
+Docker container actions can only execute on runners with a Linux operating system. 
+Self-hosted runners must use a Linux operating system and have Docker installed to run Docker container actions. 
+
+Steps:
+1. Create a dockerfile
+2. Creating an action metadata file (yml)
+3. Write code (any language)
+4. Create readme
+5. Commit, tag, and push your action to GitHub
+
+
+**JavaScript actions**
+- JavaScript actions can run directly on a runner machine, and separate the action code from the environment used to run the code. 
+- Using a JavaScript action simplifies the action code and executes faster than a Docker container action.
+- To ensure your JavaScript actions are compatible with all GitHub-hosted runners (Ubuntu, Windows, and macOS), the packaged JavaScript code you write should be pure JavaScript and not rely on other binaries. 
+- JavaScript actions run directly on the runner and use binaries that already exist in the virtual environment.
+
+Steps:
+1. Create action metadata (yml)
+2. Install toolkit packages 
+```
+npm install @actions/core
+npm install @actions/github
+```
+3. Write code
+4. Create readme
+5. Commit, tag, and push your action to GitHub
+
+
+**Composite Actions**
+- A composite action allows you to combine multiple workflow steps within one action.
+- For example, you can use this feature to bundle together multiple run commands into an action, and then have a workflow that executes the bundled commands as a single step using that action.
+
+//runners, when to use
+//labels to manage runners
+//security
+//access
+//when to use javascript/docker and why 
+//creating your own actions
+// github enterprise server limit
+// billed 
+// how ot write multi line scripts, which order
+
+**Using private action vs public action**
+**Public Action**
+```
+uses: octocat/hello-world-javascript-action@v1.1
+```
+**Private Action**
+```
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Hello world action step
+        uses: ./ 
+```
+
+**Metadata Syntax**
+| Syntax                                                                                                                                                                                                                                                                                                                                                                           | Required | Description                                                                                                                                                                                                                                                                         | Examples                                                      |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------|
+| name                                                                                                                                                                                                                                                                                                                                                                             | Yes      | Name of your action                                                                                                                                                                                                                                                                 | ``` name:'Hello World'  ```                                   |
+| author                                                                                                                                                                                                                                                                                                                                                                           | No       | The name of the action's author.                                                                                                                                                                                                                                                    | author: 'bliongosari' *                                       |
+| description                                                                                                                                                                                                                                                                                                                                                                      | Yes      | A short description of the action.                                                                                                                                                                                                                                                  | description: 'Greet someone and record the time'              |
+| inputs  - inputs.input_id (Required, String) - inputs.input_id.description (Required, String) - inputs.input_id.required (Required, boolean) - inputs.input_id.default (Optional, String) - inputs.input_id.deperecationMessage (Optional, String)                                                                                                                               | No       | - Input parameters allow you to specify data that the action expects to use during runtime.  - GitHub stores input parameters as environment variables.  - Input ids with uppercase letters are converted to lowercase during runtime.  - We recommended using lowercase input ids. |                                                               |
+| outputs  - outputs.output_id (Required, String) - outputs.output_id.description (Required, String)                                                                                                                                                                                                                                                                               | No       | Output parameters allow you to declare data that an action sets.  Actions that run later in a workflow can use the output data set in previously run actions.                                                                                                                       |                                                               |
+| outputs (for composite actions)  - outputs.output_id (Required, String) - outputs.output_id.description (Required, String) - outputs.output_id.value (Required, string)                                                                                                                                                                                                          | No       | The value that the output parameter will be mapped to. You can set this to a string or an expression with context.  For example, you can use the steps context to set the value of an output to the output value of a step.                                                         | value: ${{ steps.random-number-generator.outputs.random-id }} |
+| runs  - runs.using (String, Required) (e.g. using:'node12') - runs.main (String, Required)  (e.g. main: 'main.js') - runs.pre (String, optional) (e.g. pre: 'setup.js') - runs.pre-if (String, optional) (e.g. pre-if runner.os == 'linux') - runs.post (String, optional) (e.g post: 'cleanup.js') - runs.post-if (String, optional) (e.g. pre-if runner.os == 'linux')         | Yes      | Configures the path to the action's code and the application used to execute the code.                                                                                                                                                                                              |                                                               |
+| runs (composite)  - runs.using (String, Required) - runs.steps (String, Required) - runs.steps[*].run (String, optional)  - runs.steps[*].shell (shell: bash, shell: cmd, shell: python, etc) - runs.steps[*].id (optional) - run.steps[*].env (optional) - runs.steps[*].working-directory (optional) - runs.steps[*].uses (optional) (action) - runs.steps[*].with (optional)  | Yes      |                                                                                                                                                                                                                                                                                     |                                                               |
+| runs (docker)  - runs.using (Required) - runs.image (Required) - runs.pre-entrypoint - runs.image - runs.env - runs.entrypoint - post-entrypoint - runs.args (Optional, [String])                                                                                                                                                                                                | Yes      |                                                                                                                                                                                                                                                                                     |                                                               |
 
